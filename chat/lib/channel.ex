@@ -39,11 +39,11 @@ defmodule Channel do
     msgWithUser = fromUserDisplayName <> ": " <> message
 
     updateState(channel, msgWithUser)
-    notify(channel, message)
+    notify(channel, msgWithUser)
   end
 
   def stats(channel) do
-    Agent.get(channel, fn {msgs, users} -> IO.puts(length(msgs) / length(users)) end)
+    Agent.get(globalName(channel), fn {msgs, users} -> IO.puts(length(msgs) / length(users)) end)
   end
 
   def messages(channel) do
