@@ -51,10 +51,10 @@ defmodule Channel do
   end
 
   def users(channel) do
-    Agent.get(channel, fn {_msgs, users} -> users end)
+    Agent.get(globalName(channel), fn {_msgs, users} -> users end)
   end
 
   def join(channel, user) do
-    Agent.update(channel, fn {msgs, users} -> {msgs, [user | users]} end)
+    Agent.update(globalName(channel), fn {msgs, users} -> {msgs, [user | users]} end)
   end
 end
