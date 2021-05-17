@@ -2,7 +2,11 @@ defmodule Channel do
   use Agent
 
   def start_link(channel) do
-    Agent.start_link(fn -> restore(channel) end, name: channel)
+    Agent.start_link(fn -> restore(channel) end, name: globalName(channel))
+  end
+
+  def globalName(channel) do
+    {:global, channel}
   end
 
   def restore(channel) do
@@ -18,12 +22,12 @@ defmodule Channel do
   end
 
   def updateState(channel, message) do
-    Agent.update(channel, fn {msgs, users} -> {[message | msgs], users} end)
-    Agent.get(channel, fn {msgs, _users} -> :ets.insert(:messages, {channel, msgs}) end)
+    Agent.update(globalName(channel), fn {msgs, users} -> {[message | msgs], users} end)
+    Agent.get(globalName(channel), fn {msgs, _users} -> :ets.insert(:messages, {channel, msgs}) end)
   end
 
   def notify(channel, message) do
-    Agent.get(channel, fn {_msgs, users} -> pushMessage(message, users) end)
+    Agent.get(globalName(channel), fn {_msgs, users} -> pushMessage(message, users) end)
   end
 
   def pushMessage(message, users) do
@@ -43,7 +47,7 @@ defmodule Channel do
   end
 
   def messages(channel) do
-    Agent.get(channel, fn {msgs, _users} -> msgs end)
+    Agent.get(globalName(channel), fn {msgs, _users} -> msgs end)
   end
 
   def users(channel) do
